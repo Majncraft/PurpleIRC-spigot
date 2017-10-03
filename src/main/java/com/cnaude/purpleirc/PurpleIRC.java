@@ -34,6 +34,7 @@ import com.cnaude.purpleirc.GameListeners.GamePlayerPlayerAdvancementDoneListene
 import com.cnaude.purpleirc.GameListeners.GamePlayerQuitListener;
 import com.cnaude.purpleirc.GameListeners.GameServerCommandListener;
 import com.cnaude.purpleirc.GameListeners.HeroChatListener;
+import com.cnaude.purpleirc.GameListeners.HeroChatListener57;
 import com.cnaude.purpleirc.GameListeners.IRCMessageListener;
 import com.cnaude.purpleirc.GameListeners.McMMOChatListener;
 import com.cnaude.purpleirc.GameListeners.VentureChatListener;
@@ -55,6 +56,7 @@ import com.cnaude.purpleirc.Hooks.EssentialsHook;
 import com.cnaude.purpleirc.Hooks.FactionChatHook;
 import com.cnaude.purpleirc.Hooks.GriefPreventionHook;
 import com.cnaude.purpleirc.Hooks.HerochatHook;
+import com.cnaude.purpleirc.Hooks.HerochatHook57;
 import com.cnaude.purpleirc.Hooks.JobsHook;
 import com.cnaude.purpleirc.Hooks.McMMOChatHook;
 import com.cnaude.purpleirc.Hooks.PlaceholderApiHook;
@@ -1561,8 +1563,16 @@ public class PurpleIRC extends JavaPlugin {
         logInfo("Detecting plugin hooks...");
         if (isPluginEnabled(PL_HEROCHAT)) {
             hookList.add(hookFormat(PL_HEROCHAT, true));
-            getServer().getPluginManager().registerEvents(new HeroChatListener(this), this);
-            herochatHook = new HerochatHook(this);
+            String heroChatVersion = getServer().getPluginManager().getPlugin(PL_HEROCHAT).getDescription().getVersion();
+            if (heroChatVersion.startsWith("5.7.0")) {
+                getServer().getPluginManager().registerEvents(new HeroChatListener57(this), this);
+                herochatHook = new HerochatHook57(this);
+                logInfo("Hooked into Herochat v" + heroChatVersion);
+            } else {
+                getServer().getPluginManager().registerEvents(new HeroChatListener(this), this);
+                herochatHook = new HerochatHook(this);
+                logInfo("Hooked into Herochat v" + heroChatVersion);
+            }
             heroConfig = new YamlConfiguration();
             heroConfigFile = new File(getServer().getPluginManager()
                     .getPlugin(PL_HEROCHAT).getDataFolder(), "config.yml");
